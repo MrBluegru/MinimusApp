@@ -1,32 +1,53 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import ToDoList from "../components/ToDoList";
 import Constants from "expo-constants";
 import { toDoData } from "../data/toDos";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import { hideCompliteReducer, setTodosReducer } from "../redux/toDosSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Home() {
-  const [localData, setLocalData] = useState(
-    toDoData.sort((a, b) => {
-      return a.isCompleted - b.isCompleted;
-    })
-  );
-  const [isHidden, setIsHidden] = useState(false);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  const todos = useSelector((state) => state.todos.todos);
+
+  useEffect(() => {
+    const getTodos = async () => {
+      try {
+        const todos = await AsyncStorage.getItem("@Todos");
+        if (todos !== null) {
+          dispatch(setTodosReducer(JSON.parse(todos)));
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getTodos();
+  }, []);
+
+  // const [localData, setLocalData] = useState(
+  //   toDoData.sort((a, b) => {
+  //     return a.isCompleted - b.isCompleted;
+  //   })
+  // );
+  const [isHidden, setIsHidden] = useState(false);
 
   const handlerHidePress = () => {
-    if (isHidden) {
-      setIsHidden(false);
-      setLocalData(
-        toDoData.sort((a, b) => {
-          return a.isCompleted - b.isCompleted;
-        })
-      );
-    }
-    if (!isHidden) {
-      setIsHidden(true);
-      setLocalData(localData.filter((toDo) => !toDo.isCompleted));
-    }
+    // if (isHidden) {
+    //   setIsHidden(false);
+    //   setLocalData(
+    //     toDoData.sort((a, b) => {
+    //       return a.isCompleted - b.isCompleted;
+    //     })
+    //   );
+    // }
+    // if (!isHidden) {
+    //   setIsHidden(true);
+    //   setLocalData(localData.filter((toDo) => !toDo.isCompleted));
+    // }
   };
 
   return (
@@ -49,10 +70,10 @@ export default function Home() {
           </Text>
         </TouchableOpacity>
       </View>
-      <ToDoList toDosData={localData.filter((toDo) => toDo.isToday)} />
+      <ToDoList toDosData={todos.filter((toDo) => toDo.isToday)} />
 
-      <Text style={styles.title}> Tomorrow</Text>
-      <ToDoList toDosData={toDoData.filter((toDo) => !toDo.isToday)} />
+      <Text style={styles.title}>Tomorrow</Text>
+      <ToDoList toDosData={todos.filter((toDo) => !toDo.isToday)} />
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("Add")}

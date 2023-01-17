@@ -11,11 +11,11 @@ const Checkbox = ({ id, text, isCompleted, isToday, hour }) => {
 
   const handleCheckbox = () => {
     try {
-      dispatch(updateTodoReducer(id, isCompleted));
+      dispatch(updateTodoReducer({ id, isCompleted }));
       AsyncStorage.setItem(
         "@Todos",
         JSON.stringify(
-          listTodos.map(todo => {
+          listTodos.map((todo) => {
             if (todo.id === id) {
               return { ...todo, isCompleted: !todo.isCompleted };
             }
@@ -23,7 +23,6 @@ const Checkbox = ({ id, text, isCompleted, isToday, hour }) => {
           })
         )
       );
-      console.log("test1 pass");
     } catch (error) {
       console.log(error);
     }

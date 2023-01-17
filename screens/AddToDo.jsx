@@ -7,6 +7,7 @@ import {
   TextInput,
   Switch,
   Button,
+  Alert,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +15,7 @@ import { addTodoReducer } from "../redux/toDosSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import uuid from "react-native-uuid";
 import { useNavigation } from "@react-navigation/native";
+import * as Notifications from "expo-notifications";
 
 const AddToDo = () => {
   const dispatch = useDispatch();
@@ -25,6 +27,7 @@ const AddToDo = () => {
   const [isToday, setIsToday] = useState(false);
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
+  const [withAlert, setWithAlert] = useState(false);
 
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate;
@@ -42,7 +45,9 @@ const AddToDo = () => {
     const newTodo = {
       id: uuid.v4(),
       text: name,
-      hour: date.toLocaleTimeString().slice(0, -3),
+      hour: isToday
+        ? date.toISOString()
+        : new Date(date).getDate() + 24 * 60 * 60 * 1000, // add one day at hour(if isToday is false)
       isToday: isToday,
       isCompleted: false,
     };
@@ -51,11 +56,27 @@ const AddToDo = () => {
         "@Todos",
         JSON.stringify([...listTodos, newTodo])
       );
-      console.log(newTodo);
       dispatch(addTodoReducer(newTodo));
+      console.log(newTodo);
+      withAlert ? await scheduleTodoNotification(newTodo) : null;
       navigation.goBack();
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const scheduleTodoNotification = async (todo) => {
+    const trigger = new Date(todo.hour);
+    try {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: `It's time!`,
+          body: todo.text,
+        },
+        trigger,
+      });
+    } catch (error) {
+      alert("The notification falied to schedule, make sure the hour is valid");
     }
   };
 
@@ -88,7 +109,12 @@ const AddToDo = () => {
         <Button onPress={showMode} title="Select Hour" />
       </View>
       <View style={styles.inputContainer}>
-        <Text style={styles.inputTitle}>Today</Text>
+        <View>
+          <Text style={styles.inputTitle}>Today</Text>
+          <Text style={styles.descrip}>
+            If you disable today, the task will be considered as tomorrow
+          </Text>
+        </View>
         <Switch
           value={isToday}
           onValueChange={(value) => {
@@ -96,12 +122,25 @@ const AddToDo = () => {
           }}
         />
       </View>
+
+      <View style={styles.inputContainer}>
+        <View>
+          <Text style={styles.inputTitle}>Alert</Text>
+          <Text style={styles.descrip}>
+            You will receive an alert at the time you set for this reminder
+          </Text>
+        </View>
+        <Switch
+          value={withAlert}
+          onValueChange={(value) => {
+            setWithAlert(value);
+          }}
+        />
+      </View>
+
       <TouchableOpacity onPress={addTodo} style={styles.button}>
         <Text style={styles.done}>Done</Text>
       </TouchableOpacity>
-      <Text style={{ color: "#00000060" }}>
-        If you disable today, the task will be considered as tomorrow
-      </Text>
     </View>
   );
 };
@@ -132,6 +171,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     flexDirection: "row",
     paddingBottom: 30,
+    alignItems: "center",
   },
   time: {
     fontSize: 15,
@@ -151,6 +191,11 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     fontSize: 20,
+  },
+  descrip: {
+    color: "#00000060",
+    fontSize: 12,
+    maxWidth: "85%",
   },
 });
 

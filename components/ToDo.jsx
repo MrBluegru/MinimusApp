@@ -1,15 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import Checkbox from "./Checkbox";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteTodoReducer } from "../redux/toDosSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import moment from "moment/moment";
 
 const ToDo = ({ id, text, isCompleted, isToday, hour }) => {
-
   const dispatch = useDispatch();
   const todos = useSelector((state) => state.todos.todos);
+  const [localHour, setLocalHour] = useState(new Date(hour));
+  const [thisTodoIsToday, setThisTodoIsToday] = hour
+    ? useState(moment(new Date(hour)).isSame(moment(), "day"))
+    : useState(false);
 
   const handleDeleteTodo = async () => {
     dispatch(deleteTodoReducer(id));
@@ -30,7 +34,7 @@ const ToDo = ({ id, text, isCompleted, isToday, hour }) => {
           id={id}
           text={text}
           isCompleted={isCompleted}
-          isToday={isToday}
+          isToday={thisTodoIsToday}
           hour={hour}
         />
         <View>
@@ -50,7 +54,7 @@ const ToDo = ({ id, text, isCompleted, isToday, hour }) => {
                 : styles.time
             }
           >
-            {`${hour} Hs. `}
+            {moment(localHour).format("LT")}
           </Text>
         </View>
       </View>

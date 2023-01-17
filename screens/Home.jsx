@@ -1,25 +1,58 @@
 import { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import ToDoList from "../components/ToDoList";
 import Constants from "expo-constants";
-import { toDoData } from "../data/toDos";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { hideCompliteReducer, setTodosReducer } from "../redux/toDosSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Notifications from "expo-notifications";
+import moment from "moment";
+import * as Device from "expo-device";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 export default function Home() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
   const todos = useSelector((state) => state.todos.todos);
+  const [isHidden, setIsHidden] = useState(false);
+  const [expoPushToken, setExpoPushToken] = useState("");
 
   useEffect(() => {
+    registerForPushNotificationsAsync().then((token) =>
+      setExpoPushToken(token)
+    );
     const getTodos = async () => {
       try {
         const todos = await AsyncStorage.getItem("@Todos");
         if (todos !== null) {
-          dispatch(setTodosReducer(JSON.parse(todos)));
+          const todosData = JSON.parse(todos);
+          const todosDataFiltered = todosData.filter((todo) => {
+            return moment(new Date(todo.hour)).isSameOrAfter(moment(), "day");
+          });
+          if (todosDataFiltered !== null) {
+            await AsyncStorage.setItem(
+              "@Todos",
+              JSON.stringify(todosDataFiltered)
+            );
+            console.log("delete passed todos");
+          }
+          dispatch(setTodosReducer(todosDataFiltered));
         }
       } catch (error) {
         console.log(error);
@@ -28,26 +61,48 @@ export default function Home() {
     getTodos();
   }, []);
 
-  // const [localData, setLocalData] = useState(
-  //   toDoData.sort((a, b) => {
-  //     return a.isCompleted - b.isCompleted;
-  //   })
-  // );
-  const [isHidden, setIsHidden] = useState(false);
+  const handlerHidePress = async () => {
+    if (isHidden) {
+      setIsHidden(false);
+      const todos = await AsyncStorage.getItem("@Todos");
+      if (todos !== null) {
+        dispatch(setTodosReducer(JSON.parse(todos)));
+      }
+    }
+    if (!isHidden) {
+      setIsHidden(true);
+      dispatch(hideCompliteReducer());
+    }
+  };
 
-  const handlerHidePress = () => {
-    // if (isHidden) {
-    //   setIsHidden(false);
-    //   setLocalData(
-    //     toDoData.sort((a, b) => {
-    //       return a.isCompleted - b.isCompleted;
-    //     })
-    //   );
-    // }
-    // if (!isHidden) {
-    //   setIsHidden(true);
-    //   setLocalData(localData.filter((toDo) => !toDo.isCompleted));
-    // }
+  const registerForPushNotificationsAsync = async () => {
+    let token;
+    if (Device.isDevice) {
+      const { status: exitingStatus } =
+        await Notifications.getPermissionsAsync();
+      let finalStatus = exitingStatus;
+      if (exitingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== "granted") {
+        alert("Failed to get push token for push notification!");
+        return;
+      }
+      token = (await Notifications.getExpoPushTokenAsync()).data;
+      console.log(token);
+    } else {
+      return;
+    }
+    if (Platform.OS === "android") {
+      Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#FF2331F7C",
+      });
+    }
+    return token;
   };
 
   return (
@@ -70,10 +125,18 @@ export default function Home() {
           </Text>
         </TouchableOpacity>
       </View>
-      <ToDoList toDosData={todos.filter((toDo) => toDo.isToday)} />
+      <ToDoList
+        toDosData={todos.filter((toDo) =>
+          moment(new Date(toDo.hour)).isSame(moment(), "day")
+        )}
+      />
 
       <Text style={styles.title}>Tomorrow</Text>
-      <ToDoList toDosData={todos.filter((toDo) => !toDo.isToday)} />
+      <ToDoList
+        toDosData={todos.filter((toDo) =>
+          moment(new Date(toDo.hour)).isAfter(moment(), "day")
+        )}
+      />
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("Add")}

@@ -1,4 +1,4 @@
-# Minimus-App by Mr. Blue
+# todoBlue-App by Mr. Blue
 
 ## App of ToDo
 

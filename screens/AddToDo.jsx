@@ -7,7 +7,6 @@ import {
   TextInput,
   Switch,
   Button,
-  Alert,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,8 +23,10 @@ const AddToDo = () => {
   const listTodos = useSelector((state) => state.todos.todos);
 
   const [name, setName] = useState("");
-  const [isToday, setIsToday] = useState(false);
+  const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState("low");
   const [date, setDate] = useState(new Date());
+  const [mode, setMode] = useState("date");
   const [show, setShow] = useState(false);
   const [withAlert, setWithAlert] = useState(false);
 
@@ -35,34 +36,48 @@ const AddToDo = () => {
     setDate(currentDate);
   };
 
-  const showMode = () => {
+  const showMode = (currentMode) => {
     if (Platform.OS === "android") {
       setShow(true);
     }
+    setMode(currentMode);
+  };
+
+  const showDatepicker = () => {
+    showMode("date");
+  };
+
+  const showTimepicker = () => {
+    showMode("time");
+  };
+
+  const handlerPriority = (value) => {
+    setPriority(value);
   };
 
   const addTodo = async () => {
     const newTodo = {
       id: uuid.v4(),
-      text: name,
-      hour: isToday
-        ? date.toISOString()
-        : new Date(date).getDate() + 24 * 60 * 60 * 1000, // add one day at hour(if isToday is false)
-      isToday: isToday,
+      title: name,
+      priority: priority,
+      description: description,
+      date: date.toISOString(),
       isCompleted: false,
     };
-    try {
-      await AsyncStorage.setItem(
-        "@Todos",
-        JSON.stringify([...listTodos, newTodo])
-      );
-      dispatch(addTodoReducer(newTodo));
-      console.log(newTodo);
-      withAlert ? await scheduleTodoNotification(newTodo) : null;
-      navigation.goBack();
-    } catch (error) {
-      console.log(error);
-    }
+
+    console.log(newTodo);
+    // try {
+    //   await AsyncStorage.setItem(
+    //     "@Todos",
+    //     JSON.stringify([...listTodos, newTodo])
+    //   );
+    //   dispatch(addTodoReducer(newTodo));
+    //   console.log(newTodo);
+    //   withAlert ? await scheduleTodoNotification(newTodo) : null;
+    //   navigation.goBack();
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
   const scheduleTodoNotification = async (todo) => {
@@ -87,12 +102,26 @@ const AddToDo = () => {
         <Text style={styles.inputTitle}>Name</Text>
         <TextInput
           style={styles.textInput}
-          placeholder="Task"
+          placeholder="Task title"
           onChangeText={(text) => {
             setName(text);
           }}
         />
       </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputTitle}>Description</Text>
+        <TextInput
+          multiline={true}
+          numberOfLines={6}
+          style={styles.inputDescrip}
+          placeholder="task description..."
+          onChangeText={(text) => {
+            setDescription(text);
+          }}
+        />
+      </View>
+
       <View style={styles.inputContainer}>
         <Text style={styles.inputTitle}>Hour</Text>
         <Text style={styles.time}>
@@ -101,26 +130,117 @@ const AddToDo = () => {
         {show && (
           <DateTimePicker
             value={date}
-            mode="time"
+            mode={mode}
             is24Hour={true}
             onChange={onChange}
           />
         )}
-        <Button onPress={showMode} title="Select Hour" />
+
+        <TouchableOpacity
+          onPress={showTimepicker}
+          style={styles.prioritybutton}
+        >
+          <Text style={styles.priorityText}>SELECT HOUR</Text>
+        </TouchableOpacity>
       </View>
+
       <View style={styles.inputContainer}>
-        <View>
-          <Text style={styles.inputTitle}>Today</Text>
-          <Text style={styles.descrip}>
-            If you disable today, the task will be considered as tomorrow
-          </Text>
-        </View>
-        <Switch
-          value={isToday}
-          onValueChange={(value) => {
-            setIsToday(value);
+        <Text style={styles.inputTitle}>Date</Text>
+        <Text style={styles.time}>{date.toDateString()}</Text>
+
+        <TouchableOpacity
+          onPress={showDatepicker}
+          style={styles.prioritybutton}
+        >
+          <Text style={styles.priorityText}>SELECT DATE</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputTitle}>Priority</Text>
+        <View
+          style={{
+            flexDirection: "row",
           }}
-        />
+        >
+          <TouchableOpacity
+            onPress={() => handlerPriority("low")}
+            style={
+              priority === "low"
+                ? [
+                    styles.prioritybutton,
+                    {
+                      backgroundColor: "#00a400",
+                      borderColor: "black",
+                      borderWidth: 2,
+                    },
+                  ]
+                : styles.prioritybutton
+            }
+          >
+            <Text
+              style={
+                priority === "low"
+                  ? [(styles.priorityText, { color: "black" })]
+                  : [(styles.priorityText, { color: "#00a400" })]
+              }
+            >
+              LOW
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => handlerPriority("regular")}
+            style={
+              priority === "regular"
+                ? [
+                    styles.prioritybutton,
+                    {
+                      backgroundColor: "#e7e700",
+                      borderColor: "black",
+                      borderWidth: 2,
+                    },
+                  ]
+                : styles.prioritybutton
+            }
+          >
+            <Text
+              style={
+                priority === "regular"
+                  ? [(styles.priorityText, { color: "black" })]
+                  : [(styles.priorityText, { color: "#e7e700" })]
+              }
+            >
+              REGULAR
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => handlerPriority("high")}
+            style={
+              priority === "high"
+                ? [
+                    styles.prioritybutton,
+                    {
+                      backgroundColor: "#9d0000",
+                      borderColor: "black",
+                      borderWidth: 2,
+                    },
+                  ]
+                : styles.prioritybutton
+            }
+          >
+            <Text
+              style={
+                priority === "high"
+                  ? [(styles.priorityText, { color: "black" })]
+                  : [(styles.priorityText, { color: "#9d0000" })]
+              }
+            >
+              HIGH
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.inputContainer}>
@@ -149,7 +269,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F7F8FA",
-    paddingHorizontal: 30,
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 34,
@@ -162,15 +282,21 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     lineHeight: 24,
   },
+  inputDescrip: {
+    borderBottomColor: "#00000030",
+    borderBottomWidth: 1,
+    width: "65%",
+  },
   textInput: {
     borderBottomColor: "#00000030",
     borderBottomWidth: 1,
-    width: "80%",
+    width: "65%",
   },
   inputContainer: {
     justifyContent: "space-between",
     flexDirection: "row",
-    paddingBottom: 30,
+    paddingBottom: 20,
+    paddingTop: 10,
     alignItems: "center",
   },
   time: {
@@ -196,6 +322,20 @@ const styles = StyleSheet.create({
     color: "#00000060",
     fontSize: 12,
     maxWidth: "85%",
+  },
+  priorityText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 14,
+  },
+  prioritybutton: {
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#000000",
+    height: 40,
+    margin: 10,
+    borderRadius: 2,
+    padding: 6,
   },
 });
 

@@ -107,10 +107,6 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-      <Image
-        source={{ uri: "https://fondosmil.com/fondo/80554.jpg" }}
-        style={styles.pic}
-      />
       <View
         style={{
           flexDirection: "row",
@@ -118,7 +114,7 @@ export default function Home() {
           justifyContent: "space-between",
         }}
       >
-        <Text style={styles.title}>Today</Text>
+        <Text style={styles.title}>TODO LIST</Text>
         <TouchableOpacity onPress={handlerHidePress}>
           <Text style={{ color: "#3478f6" }}>
             {isHidden ? "Show Completed" : "Hide Complete"}
@@ -128,13 +124,6 @@ export default function Home() {
       <ToDoList
         toDosData={todos.filter((toDo) =>
           moment(new Date(toDo.hour)).isSame(moment(), "day")
-        )}
-      />
-
-      <Text style={styles.title}>Tomorrow</Text>
-      <ToDoList
-        toDosData={todos.filter((toDo) =>
-          moment(new Date(toDo.hour)).isAfter(moment(), "day")
         )}
       />
       <TouchableOpacity
@@ -160,7 +149,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
   },
   title: {
-    fontSize: 34,
+    fontSize: 30,
     fontWeight: "bold",
     marginBottom: 35,
     marginTop: 10,

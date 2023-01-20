@@ -66,18 +66,18 @@ const AddToDo = () => {
     };
 
     console.log(newTodo);
-    // try {
-    //   await AsyncStorage.setItem(
-    //     "@Todos",
-    //     JSON.stringify([...listTodos, newTodo])
-    //   );
-    //   dispatch(addTodoReducer(newTodo));
-    //   console.log(newTodo);
-    //   withAlert ? await scheduleTodoNotification(newTodo) : null;
-    //   navigation.goBack();
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    try {
+      await AsyncStorage.setItem(
+        "@Todos",
+        JSON.stringify([...listTodos, newTodo])
+      );
+      dispatch(addTodoReducer(newTodo));
+      console.log(newTodo);
+      withAlert ? await scheduleTodoNotification(newTodo) : null;
+      navigation.goBack();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const scheduleTodoNotification = async (todo) => {

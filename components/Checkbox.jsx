@@ -5,7 +5,7 @@ import { updateTodoReducer } from "../redux/toDosSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
 
-const Checkbox = ({ id, text, isCompleted, isToday, hour }) => {
+const Checkbox = ({ id, isCompleted }) => {
   const dispatch = useDispatch();
   const listTodos = useSelector((state) => state.todos.todos);
 
@@ -28,15 +28,13 @@ const Checkbox = ({ id, text, isCompleted, isToday, hour }) => {
     }
   };
 
-  return isToday ? (
+  return (
     <TouchableOpacity
       onPress={handleCheckbox}
       style={isCompleted ? styles.checked : styles.unChecked}
     >
       {isCompleted && <Entypo name="check" size={16} color="#FAFAFA" />}
     </TouchableOpacity>
-  ) : (
-    <View style={styles.isTomorrow}></View>
   );
 };
 
@@ -77,15 +75,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 5,
-  },
-  isTomorrow: {
-    width: 10,
-    height: 10,
-    marginHorizontal: 10,
-    borderRadius: 10,
-    backgroundColor: "#262626",
-    marginRight: 13,
-    marginLeft: 15,
   },
 });
 

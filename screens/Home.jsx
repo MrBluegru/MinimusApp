@@ -17,48 +17,36 @@ import * as Notifications from "expo-notifications";
 import moment from "moment";
 import * as Device from "expo-device";
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
+// Notifications.setNotificationHandler({
+//   handleNotification: async () => ({
+//     shouldShowAlert: true,
+//     shouldPlaySound: true,
+//     shouldSetBadge: true,
+//   }),
+// });
 
 export default function Home() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-
   const todos = useSelector((state) => state.todos.todos);
   const [isHidden, setIsHidden] = useState(false);
-  const [expoPushToken, setExpoPushToken] = useState("");
+  // const [expoPushToken, setExpoPushToken] = useState("");
 
   useEffect(() => {
-    registerForPushNotificationsAsync().then((token) =>
-      setExpoPushToken(token)
-    );
-    const getTodos = async () => {
-      try {
-        const todos = await AsyncStorage.getItem("@Todos");
-        if (todos !== null) {
-          const todosData = JSON.parse(todos);
-          const todosDataFiltered = todosData.filter((todo) => {
-            return moment(new Date(todo.hour)).isSameOrAfter(moment(), "day");
-          });
-          if (todosDataFiltered !== null) {
-            await AsyncStorage.setItem(
-              "@Todos",
-              JSON.stringify(todosDataFiltered)
-            );
-            console.log("delete passed todos");
-          }
-          dispatch(setTodosReducer(todosDataFiltered));
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getTodos();
+    // registerForPushNotificationsAsync().then((token) =>
+    //   setExpoPushToken(token)
+    // );
+    // const getTodos = async () => {
+    //   try {
+    //     const todos = await AsyncStorage.getItem("@Todos");
+    //     if (todos !== null) {
+    //       dispatch(setTodosReducer(todos));
+    //     }
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // };
+    // getTodos();
   }, []);
 
   const handlerHidePress = async () => {
@@ -75,35 +63,35 @@ export default function Home() {
     }
   };
 
-  const registerForPushNotificationsAsync = async () => {
-    let token;
-    if (Device.isDevice) {
-      const { status: exitingStatus } =
-        await Notifications.getPermissionsAsync();
-      let finalStatus = exitingStatus;
-      if (exitingStatus !== "granted") {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-      if (finalStatus !== "granted") {
-        alert("Failed to get push token for push notification!");
-        return;
-      }
-      token = (await Notifications.getExpoPushTokenAsync()).data;
-      console.log(token);
-    } else {
-      return;
-    }
-    if (Platform.OS === "android") {
-      Notifications.setNotificationChannelAsync("default", {
-        name: "default",
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: "#FF2331F7C",
-      });
-    }
-    return token;
-  };
+  // const registerForPushNotificationsAsync = async () => {
+  //   let token;
+  //   if (Device.isDevice) {
+  //     const { status: exitingStatus } =
+  //       await Notifications.getPermissionsAsync();
+  //     let finalStatus = exitingStatus;
+  //     if (exitingStatus !== "granted") {
+  //       const { status } = await Notifications.requestPermissionsAsync();
+  //       finalStatus = status;
+  //     }
+  //     if (finalStatus !== "granted") {
+  //       alert("Failed to get push token for push notification!");
+  //       return;
+  //     }
+  //     token = (await Notifications.getExpoPushTokenAsync()).data;
+  //     console.log(token);
+  //   } else {
+  //     return;
+  //   }
+  //   if (Platform.OS === "android") {
+  //     Notifications.setNotificationChannelAsync("default", {
+  //       name: "default",
+  //       importance: Notifications.AndroidImportance.MAX,
+  //       vibrationPattern: [0, 250, 250, 250],
+  //       lightColor: "#FF2331F7C",
+  //     });
+  //   }
+  //   return token;
+  // };
 
   return (
     <View style={styles.container}>
@@ -121,11 +109,7 @@ export default function Home() {
           </Text>
         </TouchableOpacity>
       </View>
-      <ToDoList
-        toDosData={todos.filter((toDo) =>
-          moment(new Date(toDo.hour)).isSame(moment(), "day")
-        )}
-      />
+      <ToDoList toDosData={todos} />
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("Add")}

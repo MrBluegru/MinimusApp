@@ -1,19 +1,25 @@
 import React, { useState } from "react";
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  Modal,
+  Pressable,
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import Checkbox from "./Checkbox";
 import { MaterialIcons } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteTodoReducer } from "../redux/toDosSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment/moment";
 
-const ToDo = ({ id, text, isCompleted, isToday, hour }) => {
+const ToDo = ({ id, title, isCompleted, description, date }) => {
   const dispatch = useDispatch();
   const todos = useSelector((state) => state.todos.todos);
-  const [localHour, setLocalHour] = useState(new Date(hour));
-  const [thisTodoIsToday, setThisTodoIsToday] = hour
-    ? useState(moment(new Date(hour)).isSame(moment(), "day"))
-    : useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [localHour, setLocalHour] = useState(new Date(date));
 
   const handleDeleteTodo = async () => {
     dispatch(deleteTodoReducer(id));
@@ -29,14 +35,30 @@ const ToDo = ({ id, text, isCompleted, isToday, hour }) => {
 
   return (
     <View style={styles.container}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>{description}</Text>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setModalVisible(!modalVisible)}
+            >
+              <Text style={styles.textStyle}>Close</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Checkbox
-          id={id}
-          text={text}
-          isCompleted={isCompleted}
-          isToday={thisTodoIsToday}
-          hour={hour}
-        />
+        <Checkbox id={id} isCompleted={isCompleted} />
         <View>
           <Text
             style={
@@ -45,7 +67,7 @@ const ToDo = ({ id, text, isCompleted, isToday, hour }) => {
                 : styles.text
             }
           >
-            {text}
+            {title}
           </Text>
           <Text
             style={
@@ -58,14 +80,20 @@ const ToDo = ({ id, text, isCompleted, isToday, hour }) => {
           </Text>
         </View>
       </View>
-      <TouchableOpacity onPress={handleDeleteTodo}>
-        <MaterialIcons
-          name="delete-outline"
-          size={24}
-          color="#73737340"
-          style={styles.text}
-        />
-      </TouchableOpacity>
+      <View style={{ flexDirection: "row" }}>
+        <TouchableOpacity onPress={() => setModalVisible(true)}>
+          <Entypo name="eye" size={24} color="#73737340" style={styles.icons} />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={handleDeleteTodo}>
+          <MaterialIcons
+            name="delete-outline"
+            size={24}
+            color="#73737340"
+            style={styles.icons}
+          />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -86,6 +114,53 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#a3a3a3",
     fontWeight: "500",
+  },
+
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: "#F194FF",
+  },
+  buttonClose: {
+    backgroundColor: "#2196F3",
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  icons: {
+    fontSize: 24,
+    color: "black",
+    paddingHorizontal: 8,
   },
 });
 

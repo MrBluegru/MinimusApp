@@ -1,12 +1,16 @@
 import * as React from "react";
-import { FlatList } from "react-native";
+import { View, Text, FlatList } from "react-native";
 import ToDo from "./ToDo";
 
 export default function ToDoList({ toDosData }) {
-  return (
+  return toDosData.length < 1 ? (
+    <View>
+      <Text>No task for now</Text>
+    </View>
+  ) : (
     <FlatList
       data={toDosData}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={(item) => item.id}
       renderItem={({ item }) => <ToDo {...item} />}
     />
   );

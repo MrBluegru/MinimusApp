@@ -92,7 +92,6 @@ export default function Home() {
   //   }
   //   return token;
   // };
-
   return (
     <View style={styles.container}>
       <View
@@ -109,7 +108,14 @@ export default function Home() {
           </Text>
         </TouchableOpacity>
       </View>
-      <ToDoList toDosData={todos} />
+      <View style={[styles.line, { borderBottomColor: "#9d0000" }]}></View>
+      <ToDoList toDosData={todos.filter((todo) => todo.priority === "high")} />
+      <View style={[styles.line, { borderBottomColor: "#e7e700" }]}></View>
+      <ToDoList
+        toDosData={todos.filter((todo) => todo.priority === "regular")}
+      />
+      <View style={[styles.line, { borderBottomColor: "#00a400" }]}></View>
+      <ToDoList toDosData={todos.filter((todo) => todo.priority === "low")} />
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("Add")}
@@ -125,18 +131,14 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: Constants.statusBarHeight,
     paddingHorizontal: 15,
-  },
-  pic: {
-    width: 50,
-    height: 50,
-    borderRadius: 21,
-    alignSelf: "flex-end",
+    backgroundColor: "#2a2f3a",
   },
   title: {
     fontSize: 30,
     fontWeight: "bold",
     marginBottom: 35,
     marginTop: 10,
+    color: "white",
   },
   button: {
     width: 42,
@@ -161,5 +163,10 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -8,
     left: 9,
+  },
+  line: {
+    borderBottomColor: "black",
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    marginBottom: 10,
   },
 });

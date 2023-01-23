@@ -40,17 +40,17 @@ export default function Home() {
     // registerForPushNotificationsAsync().then((token) =>
     //   setExpoPushToken(token)
     // );
-    // const getTodos = async () => {
-    //   try {
-    //     const todos = await AsyncStorage.getItem("@Todos");
-    //     if (todos !== null) {
-    //       dispatch(setTodosReducer(todos));
-    //     }
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // };
-    // getTodos();
+    const getTodos = async () => {
+      try {
+        const todos = await AsyncStorage.getItem("@Todos");
+        if (todos !== null) {
+          dispatch(setTodosReducer(JSON.parse(todos)));
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getTodos();
   }, []);
 
   const handlerHidePress = async () => {
@@ -106,31 +106,55 @@ export default function Home() {
         }}
       >
         <Text style={styles.title}>TODO LIST</Text>
-        <TouchableOpacity onPress={handlerHidePress}>
-          <Text style={{ color: "#3478f6" }}>
-            {isHidden ? "Show Completed" : "Hide Complete"}
-          </Text>
-        </TouchableOpacity>
-      </View>
-      {highList.length ? (
-        <>
-          <View style={[styles.line, { borderBottomColor: "#9d0000" }]}></View>
-          <ToDoList toDosData={highList} />
-        </>
-      ) : null}
 
-      {regularList.length ? (
+        {todos.length ? (
+          <TouchableOpacity onPress={handlerHidePress}>
+            <Text style={{ color: "#3478f6" }}>
+              {isHidden ? "Show Completed" : "Hide Complete"}
+            </Text>
+          </TouchableOpacity>
+        ) : null}
+      </View>
+      {todos.length ? (
         <>
-          <View style={[styles.line, { borderBottomColor: "#e7e700" }]}></View>
-          <ToDoList toDosData={regularList} />
+          {highList.length ? (
+            <>
+              <View
+                style={[styles.line, { borderBottomColor: "#9d0000" }]}
+              ></View>
+              <ToDoList toDosData={highList} />
+            </>
+          ) : null}
+
+          {regularList.length ? (
+            <>
+              <View
+                style={[styles.line, { borderBottomColor: "#e7e700" }]}
+              ></View>
+              <ToDoList toDosData={regularList} />
+            </>
+          ) : null}
+          {lowList.length ? (
+            <>
+              <View
+                style={[styles.line, { borderBottomColor: "#00a400" }]}
+              ></View>
+              <ToDoList toDosData={lowList} />
+            </>
+          ) : null}
         </>
-      ) : null}
-      {lowList.length ? (
-        <>
-          <View style={[styles.line, { borderBottomColor: "#00a400" }]}></View>
-          <ToDoList toDosData={lowList} />
-        </>
-      ) : null}
+      ) : (
+        <View style={styles.noTasks}>
+          <Image
+            source={require("../img/imgW.jpg")}
+            style={{ height: 150, width: 150 }}
+          />
+          <Text style={styles.textNTask}>
+            No tasks for now, to add one tap on +
+          </Text>
+        </View>
+      )}
+
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("Add")}
@@ -146,14 +170,12 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: Constants.statusBarHeight,
     paddingHorizontal: 15,
-    backgroundColor: "#2a2f3a",
   },
   title: {
     fontSize: 30,
     fontWeight: "bold",
     marginBottom: 35,
     marginTop: 10,
-    color: "white",
   },
   button: {
     width: 42,
@@ -183,5 +205,18 @@ const styles = StyleSheet.create({
     borderBottomColor: "black",
     borderBottomWidth: StyleSheet.hairlineWidth,
     marginBottom: 10,
+  },
+  noTasks: {
+    alignItems: "center",
+    backgroundColor: "#2f4858",
+    justifyContent: "center",
+    padding: 30,
+    borderRadius: 8,
+    height: "87%",
+  },
+  textNTask: {
+    color: "white",
+    fontSize: 16,
+    fontStyle: "italic",
   },
 });

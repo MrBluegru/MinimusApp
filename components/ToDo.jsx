@@ -46,10 +46,16 @@ const ToDo = ({ id, title, isCompleted, description, date, priority }) => {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>Task: {title}</Text>
-            <Text style={styles.modalText}>Description: {description}</Text>
-            <Text style={styles.modalText}>Priority: {priority}</Text>
-            <Text style={styles.modalText}>{localHour.toDateString()}, {moment(localHour).format("LT")}</Text>
+            <Text style={[styles.modalText, { fontWeight: "bold" }]}>
+              {title}
+            </Text>
+            <Text style={styles.modalText}>{description}</Text>
+            <Text style={[styles.modalText, { fontStyle: "italic" }]}>
+              Priority {priority}
+            </Text>
+            <Text style={[styles.modalText, { fontWeight: "bold" }]}>
+              {localHour.toDateString()}, {moment(localHour).format("LT")}
+            </Text>
             <Pressable
               style={[styles.button, styles.buttonClose]}
               onPress={() => setModalVisible(!modalVisible)}
@@ -141,7 +147,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   button: {
-    borderRadius: 20,
+    borderRadius: 4,
     padding: 10,
     elevation: 2,
   },
@@ -149,7 +155,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F194FF",
   },
   buttonClose: {
-    backgroundColor: "#2196F3",
+    backgroundColor: "#454d60",
   },
   textStyle: {
     color: "white",

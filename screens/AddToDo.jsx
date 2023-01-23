@@ -65,14 +65,12 @@ const AddToDo = () => {
       isCompleted: false,
     };
 
-    console.log(newTodo);
     try {
       await AsyncStorage.setItem(
         "@Todos",
         JSON.stringify([...listTodos, newTodo])
       );
       dispatch(addTodoReducer(newTodo));
-      console.log(newTodo);
       withAlert ? await scheduleTodoNotification(newTodo) : null;
       navigation.goBack();
     } catch (error) {
@@ -113,7 +111,7 @@ const AddToDo = () => {
         <Text style={styles.inputTitle}>Description</Text>
         <TextInput
           multiline={true}
-          numberOfLines={6}
+          numberOfLines={5}
           style={styles.inputDescrip}
           placeholder="task description..."
           onChangeText={(text) => {
@@ -257,7 +255,6 @@ const AddToDo = () => {
           }}
         />
       </View>
-
       <TouchableOpacity onPress={addTodo} style={styles.button}>
         <Text style={styles.done}>Done</Text>
       </TouchableOpacity>

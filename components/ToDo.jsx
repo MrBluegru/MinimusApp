@@ -15,7 +15,7 @@ import { deleteTodoReducer } from "../redux/toDosSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment/moment";
 
-const ToDo = ({ id, title, isCompleted, description, date }) => {
+const ToDo = ({ id, title, isCompleted, description, date, priority }) => {
   const dispatch = useDispatch();
   const todos = useSelector((state) => state.todos.todos);
   const [modalVisible, setModalVisible] = useState(false);
@@ -46,7 +46,10 @@ const ToDo = ({ id, title, isCompleted, description, date }) => {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>{description}</Text>
+            <Text style={styles.modalText}>Task: {title}</Text>
+            <Text style={styles.modalText}>Description: {description}</Text>
+            <Text style={styles.modalText}>Priority: {priority}</Text>
+            <Text style={styles.modalText}>{localHour.toDateString()}, {moment(localHour).format("LT")}</Text>
             <Pressable
               style={[styles.button, styles.buttonClose]}
               onPress={() => setModalVisible(!modalVisible)}

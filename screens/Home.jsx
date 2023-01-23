@@ -30,6 +30,10 @@ export default function Home() {
   const dispatch = useDispatch();
   const todos = useSelector((state) => state.todos.todos);
   const [isHidden, setIsHidden] = useState(false);
+  const highList = todos.filter((todo) => todo.priority === "high");
+  const regularList = todos.filter((todo) => todo.priority === "regular");
+  const lowList = todos.filter((todo) => todo.priority === "low");
+
   // const [expoPushToken, setExpoPushToken] = useState("");
 
   useEffect(() => {
@@ -108,14 +112,25 @@ export default function Home() {
           </Text>
         </TouchableOpacity>
       </View>
-      <View style={[styles.line, { borderBottomColor: "#9d0000" }]}></View>
-      <ToDoList toDosData={todos.filter((todo) => todo.priority === "high")} />
-      <View style={[styles.line, { borderBottomColor: "#e7e700" }]}></View>
-      <ToDoList
-        toDosData={todos.filter((todo) => todo.priority === "regular")}
-      />
-      <View style={[styles.line, { borderBottomColor: "#00a400" }]}></View>
-      <ToDoList toDosData={todos.filter((todo) => todo.priority === "low")} />
+      {highList.length ? (
+        <>
+          <View style={[styles.line, { borderBottomColor: "#9d0000" }]}></View>
+          <ToDoList toDosData={highList} />
+        </>
+      ) : null}
+
+      {regularList.length ? (
+        <>
+          <View style={[styles.line, { borderBottomColor: "#e7e700" }]}></View>
+          <ToDoList toDosData={regularList} />
+        </>
+      ) : null}
+      {lowList.length ? (
+        <>
+          <View style={[styles.line, { borderBottomColor: "#00a400" }]}></View>
+          <ToDoList toDosData={lowList} />
+        </>
+      ) : null}
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("Add")}

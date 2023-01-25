@@ -24,7 +24,7 @@ export default function App() {
 					<Stack.Screen
 						name="Add Task"
 						component={AddToDo}
-						options={{ presentation: "modal" }}
+						options={{ headerShown: false }}
 					/>
 				</Stack.Navigator>
 			</NavigationContainer>

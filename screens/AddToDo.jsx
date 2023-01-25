@@ -31,6 +31,7 @@ const AddToDo = () => {
 	const [mode, setMode] = useState("date");
 	const [show, setShow] = useState(false);
 	const [withAlert, setWithAlert] = useState(false);
+	const [isEnabled, setIsEnabled] = useState(false);
 
 	const onChange = (event, selectedDate) => {
 		const currentDate = selectedDate;
@@ -67,17 +68,19 @@ const AddToDo = () => {
 			isCompleted: false,
 		};
 
-		try {
-			await AsyncStorage.setItem(
-				"@Todos",
-				JSON.stringify([...listTodos, newTodo])
-			);
-			dispatch(addTodoReducer(newTodo));
-			withAlert ? await scheduleTodoNotification(newTodo) : null;
-			navigation.goBack();
-		} catch (error) {
-			console.log(error);
-		}
+		console.log(typeof(newTodo.date));
+		console.log(newTodo.date);
+		// try {
+		// 	await AsyncStorage.setItem(
+		// 		"@Todos",
+		// 		JSON.stringify([...listTodos, newTodo])
+		// 	);
+		// 	dispatch(addTodoReducer(newTodo));
+		// 	withAlert ? await scheduleTodoNotification(newTodo) : null;
+		// 	navigation.goBack();
+		// } catch (error) {
+		// 	console.log(error);
+		// }
 	};
 
 	const scheduleTodoNotification = async (todo) => {
@@ -99,6 +102,7 @@ const AddToDo = () => {
 
 	return (
 		<View style={styles.container}>
+			<Text style={styles.title}>Add Todo</Text>
 			<View style={styles.inputContainer}>
 				<Text style={styles.inputTitle}>Name</Text>
 				<TextInput
@@ -258,11 +262,21 @@ const AddToDo = () => {
 					onValueChange={(value) => {
 						setWithAlert(value);
 					}}
+					trackColor={{ false: "#767577", true: "#3ccc15" }}
+					thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
 				/>
 			</View>
-			<TouchableOpacity onPress={addTodo} style={styles.button}>
-				<Text style={styles.done}>Done</Text>
-			</TouchableOpacity>
+			<View style={styles.btons}>
+				<TouchableOpacity
+					onPress={() => navigation.navigate("Home")}
+					style={styles.button}
+				>
+					<Text style={[styles.done, { color: "red" }]}>Cancel</Text>
+				</TouchableOpacity>
+				<TouchableOpacity onPress={addTodo} style={styles.button}>
+					<Text style={styles.done}>Done</Text>
+				</TouchableOpacity>
+			</View>
 		</View>
 	);
 };
@@ -270,9 +284,8 @@ const AddToDo = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#F7F8FA",
 		paddingHorizontal: 20,
-		paddingVertical: 30,
+		paddingVertical: "10%",
 		backgroundColor: colorScheme === "light" ? "#fff" : "black",
 	},
 	title: {
@@ -280,6 +293,7 @@ const styles = StyleSheet.create({
 		fontWeight: "bold",
 		marginBottom: 35,
 		marginTop: 10,
+		color: colorScheme === "light" ? "black" : "#F7F8FA",
 	},
 	inputTitle: {
 		fontSize: 20,
@@ -320,6 +334,11 @@ const styles = StyleSheet.create({
 		backgroundColor: colorScheme === "light" ? "black" : "#fff",
 		height: 46,
 		borderRadius: 11,
+		width: "40%",
+	},
+	btons: {
+		flexDirection: "row",
+		justifyContent: "space-around",
 	},
 	done: {
 		color: colorScheme === "light" ? "#fff" : "black",

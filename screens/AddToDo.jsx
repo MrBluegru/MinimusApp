@@ -59,28 +59,27 @@ const AddToDo = () => {
 	};
 
 	const addTodo = async () => {
+		const regex = /[:]+[0-9]+[.]/g;
 		const newTodo = {
 			id: uuid.v4(),
 			title: name,
 			priority: priority,
 			description: description,
-			date: date.toISOString(),
+			date: date.toISOString().replace(regex, ":00."),
 			isCompleted: false,
 		};
 
-		console.log(typeof(newTodo.date));
-		console.log(newTodo.date);
-		// try {
-		// 	await AsyncStorage.setItem(
-		// 		"@Todos",
-		// 		JSON.stringify([...listTodos, newTodo])
-		// 	);
-		// 	dispatch(addTodoReducer(newTodo));
-		// 	withAlert ? await scheduleTodoNotification(newTodo) : null;
-		// 	navigation.goBack();
-		// } catch (error) {
-		// 	console.log(error);
-		// }
+		try {
+			await AsyncStorage.setItem(
+				"@Todos",
+				JSON.stringify([...listTodos, newTodo])
+			);
+			dispatch(addTodoReducer(newTodo));
+			withAlert ? await scheduleTodoNotification(newTodo) : null;
+			navigation.goBack();
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	const scheduleTodoNotification = async (todo) => {

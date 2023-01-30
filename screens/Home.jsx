@@ -6,6 +6,8 @@ import {
 	Text,
 	TouchableOpacity,
 	View,
+	BackHandler,
+	Alert,
 } from "react-native";
 import ToDoList from "../components/ToDoList";
 import Constants from "expo-constants";
@@ -20,13 +22,13 @@ import { Appearance } from "react-native";
 
 const colorScheme = Appearance.getColorScheme();
 
-// Notifications.setNotificationHandler({
-//   handleNotification: async () => ({
-//     shouldShowAlert: true,
-//     shouldPlaySound: true,
-//     shouldSetBadge: true,
-//   }),
-// });
+Notifications.setNotificationHandler({
+	handleNotification: async () => ({
+		shouldShowAlert: true,
+		shouldPlaySound: true,
+		shouldSetBadge: true,
+	}),
+});
 
 export default function Home() {
 	const navigation = useNavigation();
@@ -36,12 +38,12 @@ export default function Home() {
 	const highList = todos.filter((todo) => todo.priority === "high");
 	const regularList = todos.filter((todo) => todo.priority === "regular");
 	const lowList = todos.filter((todo) => todo.priority === "low");
-	// const [expoPushToken, setExpoPushToken] = useState("");
+	const [expoPushToken, setExpoPushToken] = useState("");
 
 	useEffect(() => {
-		// registerForPushNotificationsAsync().then((token) =>
-		//   setExpoPushToken(token)
-		// );
+		registerForPushNotificationsAsync().then((token) =>
+			setExpoPushToken(token)
+		);
 		const getTodos = async () => {
 			try {
 				const todos = await AsyncStorage.getItem("@Todos");
@@ -53,6 +55,27 @@ export default function Home() {
 			}
 		};
 		getTodos();
+	}, []);
+
+	useEffect(() => {
+		const backAction = () => {
+			Alert.alert("Hold on!", "Do you want to exit the application?", [
+				{
+					text: "Cancel",
+					onPress: () => null,
+					style: "cancel",
+				},
+				{ text: "YES", onPress: () => BackHandler.exitApp() },
+			]);
+			return true;
+		};
+
+		const backHandler = BackHandler.addEventListener(
+			"hardwareBackPress",
+			backAction
+		);
+
+		return () => backHandler.remove();
 	}, []);
 
 	const handlerHidePress = async () => {
@@ -69,35 +92,35 @@ export default function Home() {
 		}
 	};
 
-	// const registerForPushNotificationsAsync = async () => {
-	//   let token;
-	//   if (Device.isDevice) {
-	//     const { status: exitingStatus } =
-	//       await Notifications.getPermissionsAsync();
-	//     let finalStatus = exitingStatus;
-	//     if (exitingStatus !== "granted") {
-	//       const { status } = await Notifications.requestPermissionsAsync();
-	//       finalStatus = status;
-	//     }
-	//     if (finalStatus !== "granted") {
-	//       alert("Failed to get push token for push notification!");
-	//       return;
-	//     }
-	//     token = (await Notifications.getExpoPushTokenAsync()).data;
-	//     console.log(token);
-	//   } else {
-	//     return;
-	//   }
-	//   if (Platform.OS === "android") {
-	//     Notifications.setNotificationChannelAsync("default", {
-	//       name: "default",
-	//       importance: Notifications.AndroidImportance.MAX,
-	//       vibrationPattern: [0, 250, 250, 250],
-	//       lightColor: "#FF2331F7C",
-	//     });
-	//   }
-	//   return token;
-	// };
+	const registerForPushNotificationsAsync = async () => {
+		let token;
+		if (Device.isDevice) {
+			const { status: exitingStatus } =
+				await Notifications.getPermissionsAsync();
+			let finalStatus = exitingStatus;
+			if (exitingStatus !== "granted") {
+				const { status } = await Notifications.requestPermissionsAsync();
+				finalStatus = status;
+			}
+			if (finalStatus !== "granted") {
+				alert("Failed to get push token for push notification!");
+				return;
+			}
+			token = (await Notifications.getExpoPushTokenAsync()).data;
+		} else {
+			return;
+		}
+		if (Platform.OS === "android") {
+			Notifications.setNotificationChannelAsync("default", {
+				name: "default",
+				importance: Notifications.AndroidImportance.MAX,
+				vibrationPattern: [0, 250, 250, 250],
+				lightColor: "#FF231F7C",
+			});
+		}
+		return token;
+	};
+
 	return (
 		<View style={styles.container}>
 			<View
@@ -174,7 +197,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		paddingTop: Constants.statusBarHeight,
 		paddingHorizontal: 15,
-		backgroundColor: colorScheme === "light" ? "#fff" : "black",
+		backgroundColor: colorScheme === "light" ? "#fff" : "#161526",
 	},
 	title: {
 		fontSize: 30,

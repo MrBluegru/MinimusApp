@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
 	View,
 	TouchableOpacity,
@@ -7,6 +7,8 @@ import {
 	TextInput,
 	Switch,
 	Button,
+	Alert,
+	BackHandler,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,6 +34,27 @@ const AddToDo = () => {
 	const [show, setShow] = useState(false);
 	const [withAlert, setWithAlert] = useState(false);
 	const [isEnabled, setIsEnabled] = useState(false);
+
+	useEffect(() => {
+		const backAction = () => {
+			Alert.alert("Hold on!", "Are you sure you want to go back?", [
+				{
+					text: "Cancel",
+					onPress: () => null,
+					style: "cancel",
+				},
+				{ text: "YES", onPress: () => navigation.navigate("Home") },
+			]);
+			return true;
+		};
+
+		const backHandler = BackHandler.addEventListener(
+			"hardwareBackPress",
+			backAction
+		);
+
+		return () => backHandler.remove();
+	}, []);
 
 	const onChange = (event, selectedDate) => {
 		const currentDate = selectedDate;
@@ -83,7 +106,7 @@ const AddToDo = () => {
 	};
 
 	const scheduleTodoNotification = async (todo) => {
-		const trigger = new Date(todo.hour);
+		const trigger = new Date(todo.date);
 		try {
 			await Notifications.scheduleNotificationAsync({
 				content: {
@@ -97,6 +120,21 @@ const AddToDo = () => {
 				"The notification falied to schedule, make sure the hour is valid"
 			);
 		}
+	};
+
+	const handlerGoBack = () => {
+		Alert.alert("Cancel ?", `Changes will not be saved`, [
+			{
+				text: "Cancel",
+				style: "cancel",
+			},
+			{
+				text: "YES",
+				onPress: () => {
+					navigation.navigate("Home");
+				},
+			},
+		]);
 	};
 
 	return (
@@ -177,7 +215,8 @@ const AddToDo = () => {
 										styles.prioritybutton,
 										{
 											backgroundColor: "#00a400",
-											borderColor: "black",
+											borderColor:
+												colorScheme === "light" ? "#000" : "#fff",
 											borderWidth: 2,
 										},
 								  ]
@@ -187,7 +226,12 @@ const AddToDo = () => {
 						<Text
 							style={
 								priority === "low"
-									? [(styles.priorityText, { color: "black" })]
+									? [
+											(styles.priorityText,
+											{
+												color: colorScheme === "light" ? "#000" : "#fff",
+											}),
+									  ]
 									: [(styles.priorityText, { color: "#00a400" })]
 							}
 						>
@@ -202,8 +246,9 @@ const AddToDo = () => {
 								? [
 										styles.prioritybutton,
 										{
-											backgroundColor: "#e7e700",
-											borderColor: "black",
+											backgroundColor: "#feb92a",
+											borderColor:
+												colorScheme === "light" ? "#000" : "#fff",
 											borderWidth: 2,
 										},
 								  ]
@@ -213,8 +258,13 @@ const AddToDo = () => {
 						<Text
 							style={
 								priority === "regular"
-									? [(styles.priorityText, { color: "black" })]
-									: [(styles.priorityText, { color: "#e7e700" })]
+									? [
+											(styles.priorityText,
+											{
+												color: colorScheme === "light" ? "#000" : "#fff",
+											}),
+									  ]
+									: [(styles.priorityText, { color: "#feb92a" })]
 							}
 						>
 							REGULAR
@@ -228,8 +278,9 @@ const AddToDo = () => {
 								? [
 										styles.prioritybutton,
 										{
-											backgroundColor: "#9d0000",
-											borderColor: "black",
+											backgroundColor: "#cc0000",
+											borderColor:
+												colorScheme === "light" ? "#000" : "#fff",
 											borderWidth: 2,
 										},
 								  ]
@@ -239,8 +290,13 @@ const AddToDo = () => {
 						<Text
 							style={
 								priority === "high"
-									? [(styles.priorityText, { color: "black" })]
-									: [(styles.priorityText, { color: "#9d0000" })]
+									? [
+											(styles.priorityText,
+											{
+												color: colorScheme === "light" ? "#000" : "#fff",
+											}),
+									  ]
+									: [(styles.priorityText, { color: "#cc0000" })]
 							}
 						>
 							HIGH
@@ -266,10 +322,7 @@ const AddToDo = () => {
 				/>
 			</View>
 			<View style={styles.btons}>
-				<TouchableOpacity
-					onPress={() => navigation.navigate("Home")}
-					style={styles.button}
-				>
+				<TouchableOpacity onPress={handlerGoBack} style={styles.button}>
 					<Text style={[styles.done, { color: "red" }]}>Cancel</Text>
 				</TouchableOpacity>
 				<TouchableOpacity onPress={addTodo} style={styles.button}>
@@ -285,7 +338,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		paddingHorizontal: 20,
 		paddingVertical: "10%",
-		backgroundColor: colorScheme === "light" ? "#fff" : "black",
+		backgroundColor: colorScheme === "light" ? "#fff" : "#161526",
 	},
 	title: {
 		fontSize: 34,

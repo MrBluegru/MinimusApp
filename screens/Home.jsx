@@ -17,8 +17,7 @@ import * as Notifications from "expo-notifications";
 import moment from "moment";
 import * as Device from "expo-device";
 import { Appearance } from "react-native";
-import { styles } from "../components/styles/home";
-
+import { styles } from "../styles/home";
 
 Notifications.setNotificationHandler({
 	handleNotification: async () => ({

@@ -15,8 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { deleteTodoReducer } from "../redux/toDosSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment/moment";
-import { Appearance } from "react-native";
-const colorScheme = Appearance.getColorScheme();
+import { blackWhite } from "../styles/colors";
 
 const ToDo = ({ id, title, isCompleted, description, date, priority }) => {
 	const dispatch = useDispatch();
@@ -34,7 +33,7 @@ const ToDo = ({ id, title, isCompleted, description, date, priority }) => {
 					style: "cancel",
 				},
 				{
-					text: "OK",
+					text: "DELETE",
 					onPress: async () => {
 						dispatch(deleteTodoReducer(id));
 						try {
@@ -112,7 +111,7 @@ const ToDo = ({ id, title, isCompleted, description, date, priority }) => {
 					<Entypo
 						name="eye"
 						size={24}
-						color={colorScheme === "light" ? "#73737340" : "#fff"}
+						color={blackWhite}
 						style={styles.icons}
 					/>
 				</TouchableOpacity>
@@ -121,7 +120,7 @@ const ToDo = ({ id, title, isCompleted, description, date, priority }) => {
 					<MaterialIcons
 						name="delete-outline"
 						size={24}
-						color={colorScheme === "light" ? "#73737340" : "#fff"}
+						color={"red"}
 						style={styles.icons}
 					/>
 				</TouchableOpacity>

@@ -1,51 +1,57 @@
-import { Appearance, StyleSheet } from "react-native";
-const colorScheme = Appearance.getColorScheme();
+import { StyleSheet } from "react-native";
+import {
+	backgroundTodoTheme,
+	borderDarkWhite,
+	blackWhite,
+	whiteBlack,
+	defaultWhite
+} from "./colors";
 
 export const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		paddingHorizontal: 20,
 		paddingVertical: "10%",
-		backgroundColor: colorScheme === "light" ? "#fff" : "#161526",
+		backgroundColor: backgroundTodoTheme,
 	},
 	title: {
 		fontSize: 34,
 		fontWeight: "bold",
 		marginBottom: 15,
 		marginTop: 10,
-		color: colorScheme === "light" ? "black" : "#F7F8FA",
+		color: blackWhite,
 	},
 	line: {
 		borderBottomWidth: StyleSheet.hairlineWidth,
 		marginBottom: 25,
-		borderBottomColor: colorScheme === "light" ? "#161526" : "#fff",
+		borderBottomColor: borderDarkWhite,
 	},
 	inputTitle: {
 		fontSize: 20,
 		fontWeight: "600",
 		lineHeight: 24,
-		color: colorScheme === "light" ? "black" : "#fff",
+		color: blackWhite,
 	},
 	textInput: {
-		borderBottomColor: colorScheme === "light" ? "#00000030" : "#fff",
+		borderBottomColor: borderDarkWhite,
 		borderBottomWidth: 1,
 		width: "65%",
-		color: colorScheme === "light" ? null : "#fff",
+		color: defaultWhite,
 	},
 	errorView: {
 		alignItems: "center",
-		marginLeft: '20%',
+		marginLeft: "20%",
 		marginTop: -10,
-		height: 18
+		height: 18,
 	},
-	error : {
-		color: 'red'
+	error: {
+		color: "red",
 	},
 	inputDescrip: {
-		borderBottomColor: colorScheme === "light" ? "#00000030" : "#fff",
+		borderBottomColor: borderDarkWhite,
 		borderBottomWidth: 1,
 		width: "65%",
-		color: colorScheme === "light" ? null : "#fff",
+		color: defaultWhite,
 	},
 	inputContainer: {
 		justifyContent: "space-between",
@@ -58,14 +64,14 @@ export const styles = StyleSheet.create({
 		fontSize: 15,
 		fontWeight: "600",
 		lineHeight: 24,
-		color: colorScheme === "light" ? "black" : "#fff",
+		color: blackWhite,
 	},
 	button: {
 		marginTop: 30,
 		marginBottom: 15,
 		alignItems: "center",
 		justifyContent: "center",
-		backgroundColor: colorScheme === "light" ? "black" : "#fff",
+		backgroundColor: blackWhite,
 		height: 46,
 		borderRadius: 11,
 		width: "40%",
@@ -75,17 +81,17 @@ export const styles = StyleSheet.create({
 		justifyContent: "space-around",
 	},
 	done: {
-		color: colorScheme === "light" ? "#fff" : "black",
+		color: whiteBlack,
 		fontWeight: "bold",
 		fontSize: 20,
 	},
 	descrip: {
-		color: colorScheme === "light" ? "#00000060" : "#fff",
+		color: borderDarkWhite,
 		fontSize: 12,
 		maxWidth: "85%",
 	},
 	priorityText: {
-		color: colorScheme === "light" ? "#fff" : "#000",
+		color: whiteBlack,
 		fontWeight: "bold",
 		fontSize: 14,
 	},
@@ -96,6 +102,6 @@ export const styles = StyleSheet.create({
 		margin: 10,
 		borderRadius: 2,
 		padding: 6,
-		backgroundColor: colorScheme === "light" ? "black" : "#fff",
+		backgroundColor: blackWhite,
 	},
 });

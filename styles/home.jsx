@@ -1,26 +1,26 @@
-import { Appearance, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import Constants from "expo-constants";
-const colorScheme = Appearance.getColorScheme();
+import { backgroundTodoTheme, blackWhite, whiteBlack } from "./colors";
 
 export const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		paddingTop: Constants.statusBarHeight,
 		paddingHorizontal: 15,
-		backgroundColor: colorScheme === "light" ? "#fff" : "#161526",
+		backgroundColor: backgroundTodoTheme,
 	},
 	title: {
 		fontSize: 30,
 		fontWeight: "bold",
 		marginBottom: 35,
 		marginTop: 10,
-		color: colorScheme === "light" ? "black" : "#fff",
+		color: blackWhite,
 	},
 	button: {
 		width: 42,
 		height: 42,
 		borderRadius: 21,
-		backgroundColor: colorScheme === "light" ? "black" : "#fff",
+		backgroundColor: blackWhite,
 		position: "absolute",
 		bottom: 30,
 		right: 25,
@@ -35,7 +35,31 @@ export const styles = StyleSheet.create({
 	},
 	plus: {
 		fontSize: 40,
-		color: colorScheme === "light" ? "#fff" : "#000",
+		color: whiteBlack,
+		position: "absolute",
+		top: -8,
+		left: 9,
+	},
+	buttonTheme: {
+		width: 42,
+		height: 42,
+		borderRadius: 21,
+		backgroundColor: blackWhite,
+		position: "absolute",
+		bottom: 90,
+		right: 25,
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.5,
+		shadowRadius: 5,
+		elevation: 5,
+	},
+	iconTheme: {
+		fontSize: 40,
+		color: whiteBlack,
 		position: "absolute",
 		top: -8,
 		left: 9,
@@ -55,6 +79,6 @@ export const styles = StyleSheet.create({
 	textNTask: {
 		fontSize: 16,
 		fontStyle: "italic",
-		color: colorScheme === "light" ? "black" : "#fff",
+		color: blackWhite,
 	},
 });

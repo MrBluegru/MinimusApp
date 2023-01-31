@@ -17,7 +17,7 @@ import uuid from "react-native-uuid";
 import { useNavigation } from "@react-navigation/native";
 import * as Notifications from "expo-notifications";
 import { Appearance } from "react-native";
-import { styles } from "../components/styles/addToDo";
+import { styles } from "../styles/addToDo";
 
 const AddToDo = () => {
 	const dispatch = useDispatch();
@@ -38,7 +38,7 @@ const AddToDo = () => {
 
 	useEffect(() => {
 		const backAction = () => {
-			Alert.alert("Hold on!", "Are you sure you want to go back?", [
+			Alert.alert("Wait", `Changes will not be saved`, [
 				{
 					text: "Cancel",
 					onPress: () => null,
@@ -84,25 +84,29 @@ const AddToDo = () => {
 
 	//? Validation /////////////////
 
-	const validation = (name) => {
+	const validation = (name, date) => {
+		const currentDate = new Date();
 		let error = {
 			name: null,
-			date: null,
 			time: null,
 		};
 
-		if (name.length < 1) {
+		if (name.length < 4) {
 			error.name = "Name of task required";
 		}
-		if (name.length < 4) {
-			error.name = "Very short name";
+		if (currentDate.getTime() === date.getTime()) {
+			error.time = "The time/date cannot be equal to this moment";
+		}
+		if (date.getTime() < currentDate.getTime()) {
+			error.time = "The time/date cannot be earlier to this moment";
 		}
 		return error;
 	};
 
-	const errorName = validation(name);
+	const errors = validation(name, date);
 
 	//? ///////////// /////////////////
+
 	const addTodo = async () => {
 		const regex = /[:]+[0-9]+[.]/g;
 		const newTodo = {
@@ -113,8 +117,13 @@ const AddToDo = () => {
 			date: date.toISOString().replace(regex, ":00."),
 			isCompleted: false,
 		};
-		if (errorName) {
-			Alert.alert("Wait", "Name is required");
+		if ((errors.name || errors.time) !== null) {
+			Alert.alert(
+				"Wait",
+				`${errors.name === null ? "" : errors.name}\n${
+					errors.time === null ? "" : errors.time
+				}`
+			);
 		} else {
 			try {
 				await AsyncStorage.setItem(
@@ -135,8 +144,8 @@ const AddToDo = () => {
 		try {
 			await Notifications.scheduleNotificationAsync({
 				content: {
-					title: `It's time!`,
-					body: todo.text,
+					title: `It's time to ${todo.title}`,
+					body: todo.description,
 				},
 				trigger,
 			});
@@ -148,7 +157,7 @@ const AddToDo = () => {
 	};
 
 	const handlerGoBack = () => {
-		Alert.alert("Cancel ?", `Changes will not be saved`, [
+		Alert.alert("Wait", `Changes will not be saved`, [
 			{
 				text: "Cancel",
 				style: "cancel",
@@ -162,7 +171,11 @@ const AddToDo = () => {
 		]);
 	};
 	const errorNFocus = () => {
-		errorActive ? setErrorActive(true) : false;
+		if (errorActive === true) {
+			setErrorActive(false);
+		} else {
+			setErrorActive(true);
+		}
 	};
 	return (
 		<View style={styles.container}>
@@ -183,7 +196,7 @@ const AddToDo = () => {
 				</View>
 				<View style={styles.errorView}>
 					<Text style={styles.error}>
-						{errorActive ? errorName.name : ""}
+						{errorActive ? errors.name : ""}
 					</Text>
 				</View>
 
@@ -233,6 +246,12 @@ const AddToDo = () => {
 					>
 						<Text style={styles.priorityText}>SELECT DATE</Text>
 					</TouchableOpacity>
+				</View>
+
+				<View style={styles.errorView}>
+					<Text style={styles.error}>
+						{errorActive ? errors.time : ""}
+					</Text>
 				</View>
 
 				<View style={styles.inputContainer}>

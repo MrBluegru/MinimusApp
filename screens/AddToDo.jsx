@@ -2,13 +2,12 @@ import React, { useState, useEffect } from "react";
 import {
 	View,
 	TouchableOpacity,
-	StyleSheet,
 	Text,
 	TextInput,
 	Switch,
-	Button,
 	Alert,
 	BackHandler,
+	ScrollView,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,11 +17,12 @@ import uuid from "react-native-uuid";
 import { useNavigation } from "@react-navigation/native";
 import * as Notifications from "expo-notifications";
 import { Appearance } from "react-native";
-const colorScheme = Appearance.getColorScheme();
+import { styles } from "../components/styles/addToDo";
 
 const AddToDo = () => {
 	const dispatch = useDispatch();
 	const navigation = useNavigation();
+	const colorScheme = Appearance.getColorScheme();
 
 	const listTodos = useSelector((state) => state.todos.todos);
 
@@ -34,6 +34,7 @@ const AddToDo = () => {
 	const [show, setShow] = useState(false);
 	const [withAlert, setWithAlert] = useState(false);
 	const [isEnabled, setIsEnabled] = useState(false);
+	const [errorActive, setErrorActive] = useState(false);
 
 	useEffect(() => {
 		const backAction = () => {
@@ -81,6 +82,27 @@ const AddToDo = () => {
 		setPriority(value);
 	};
 
+	//? Validation /////////////////
+
+	const validation = (name) => {
+		let error = {
+			name: null,
+			date: null,
+			time: null,
+		};
+
+		if (name.length < 1) {
+			error.name = "Name of task required";
+		}
+		if (name.length < 4) {
+			error.name = "Very short name";
+		}
+		return error;
+	};
+
+	const errorName = validation(name);
+
+	//? ///////////// /////////////////
 	const addTodo = async () => {
 		const regex = /[:]+[0-9]+[.]/g;
 		const newTodo = {
@@ -91,17 +113,20 @@ const AddToDo = () => {
 			date: date.toISOString().replace(regex, ":00."),
 			isCompleted: false,
 		};
-
-		try {
-			await AsyncStorage.setItem(
-				"@Todos",
-				JSON.stringify([...listTodos, newTodo])
-			);
-			dispatch(addTodoReducer(newTodo));
-			withAlert ? await scheduleTodoNotification(newTodo) : null;
-			navigation.goBack();
-		} catch (error) {
-			console.log(error);
+		if (errorName) {
+			Alert.alert("Wait", "Name is required");
+		} else {
+			try {
+				await AsyncStorage.setItem(
+					"@Todos",
+					JSON.stringify([...listTodos, newTodo])
+				);
+				dispatch(addTodoReducer(newTodo));
+				withAlert ? await scheduleTodoNotification(newTodo) : null;
+				navigation.goBack();
+			} catch (error) {
+				console.log(error);
+			}
 		}
 	};
 
@@ -136,286 +161,213 @@ const AddToDo = () => {
 			},
 		]);
 	};
-
+	const errorNFocus = () => {
+		errorActive ? setErrorActive(true) : false;
+	};
 	return (
 		<View style={styles.container}>
 			<Text style={styles.title}>Add Todo</Text>
-			<View style={styles.inputContainer}>
-				<Text style={styles.inputTitle}>Name</Text>
-				<TextInput
-					style={styles.textInput}
-					placeholder="Task title"
-					placeholderTextColor={colorScheme === "light" ? null : "grey"}
-					onChangeText={(text) => {
-						setName(text);
-					}}
-				/>
-			</View>
-
-			<View style={styles.inputContainer}>
-				<Text style={styles.inputTitle}>Description</Text>
-				<TextInput
-					multiline={true}
-					numberOfLines={5}
-					style={styles.inputDescrip}
-					placeholder="task description..."
-					placeholderTextColor={colorScheme === "light" ? null : "grey"}
-					onChangeText={(text) => {
-						setDescription(text);
-					}}
-				/>
-			</View>
-
-			<View style={styles.inputContainer}>
-				<Text style={styles.inputTitle}>Hour</Text>
-				<Text style={styles.time}>
-					{date.toLocaleTimeString().slice(0, -3)}
-				</Text>
-				{show && (
-					<DateTimePicker
-						value={date}
-						mode={mode}
-						is24Hour={true}
-						onChange={onChange}
+			<View style={styles.line}></View>
+			<ScrollView>
+				<View style={styles.inputContainer}>
+					<Text style={styles.inputTitle}>Name</Text>
+					<TextInput
+						style={styles.textInput}
+						placeholder="Task title"
+						placeholderTextColor={colorScheme === "light" ? null : "grey"}
+						onChangeText={(text) => {
+							setName(text);
+						}}
+						onFocus={errorNFocus}
 					/>
-				)}
+				</View>
+				<View style={styles.errorView}>
+					<Text style={styles.error}>
+						{errorActive ? errorName.name : ""}
+					</Text>
+				</View>
 
-				<TouchableOpacity
-					onPress={showTimepicker}
-					style={styles.prioritybutton}
-				>
-					<Text style={styles.priorityText}>SELECT HOUR</Text>
-				</TouchableOpacity>
-			</View>
+				<View style={styles.inputContainer}>
+					<Text style={styles.inputTitle}>Description</Text>
+					<TextInput
+						multiline={true}
+						numberOfLines={5}
+						style={styles.inputDescrip}
+						placeholder="task description..."
+						placeholderTextColor={colorScheme === "light" ? null : "grey"}
+						onChangeText={(text) => {
+							setDescription(text);
+						}}
+					/>
+				</View>
 
-			<View style={styles.inputContainer}>
-				<Text style={styles.inputTitle}>Date</Text>
-				<Text style={styles.time}>{date.toDateString()}</Text>
+				<View style={styles.inputContainer}>
+					<Text style={styles.inputTitle}>Hour</Text>
+					<Text style={styles.time}>
+						{date.toLocaleTimeString().slice(0, -3)}
+					</Text>
+					{show && (
+						<DateTimePicker
+							value={date}
+							mode={mode}
+							is24Hour={true}
+							onChange={onChange}
+						/>
+					)}
 
-				<TouchableOpacity
-					onPress={showDatepicker}
-					style={styles.prioritybutton}
-				>
-					<Text style={styles.priorityText}>SELECT DATE</Text>
-				</TouchableOpacity>
-			</View>
-
-			<View style={styles.inputContainer}>
-				<Text style={styles.inputTitle}>Priority</Text>
-				<View
-					style={{
-						flexDirection: "row",
-					}}
-				>
 					<TouchableOpacity
-						onPress={() => handlerPriority("low")}
-						style={
-							priority === "low"
-								? [
-										styles.prioritybutton,
-										{
-											backgroundColor: "#00a400",
-											borderColor:
-												colorScheme === "light" ? "#000" : "#fff",
-											borderWidth: 2,
-										},
-								  ]
-								: styles.prioritybutton
-						}
+						onPress={showTimepicker}
+						style={styles.prioritybutton}
 					>
-						<Text
+						<Text style={styles.priorityText}>SELECT HOUR</Text>
+					</TouchableOpacity>
+				</View>
+
+				<View style={styles.inputContainer}>
+					<Text style={styles.inputTitle}>Date</Text>
+					<Text style={styles.time}>{date.toDateString()}</Text>
+
+					<TouchableOpacity
+						onPress={showDatepicker}
+						style={styles.prioritybutton}
+					>
+						<Text style={styles.priorityText}>SELECT DATE</Text>
+					</TouchableOpacity>
+				</View>
+
+				<View style={styles.inputContainer}>
+					<Text style={styles.inputTitle}>Priority</Text>
+					<View
+						style={{
+							flexDirection: "row",
+						}}
+					>
+						<TouchableOpacity
+							onPress={() => handlerPriority("low")}
 							style={
 								priority === "low"
 									? [
-											(styles.priorityText,
+											styles.prioritybutton,
 											{
-												color: colorScheme === "light" ? "#000" : "#fff",
-											}),
+												backgroundColor: "#00a400",
+												borderColor:
+													colorScheme === "light" ? "#000" : "#fff",
+												borderWidth: 2,
+											},
 									  ]
-									: [(styles.priorityText, { color: "#00a400" })]
+									: styles.prioritybutton
 							}
 						>
-							LOW
-						</Text>
-					</TouchableOpacity>
+							<Text
+								style={
+									priority === "low"
+										? [
+												(styles.priorityText,
+												{
+													color: colorScheme === "light" ? "#000" : "#fff",
+												}),
+										  ]
+										: [(styles.priorityText, { color: "#00a400" })]
+								}
+							>
+								LOW
+							</Text>
+						</TouchableOpacity>
 
-					<TouchableOpacity
-						onPress={() => handlerPriority("regular")}
-						style={
-							priority === "regular"
-								? [
-										styles.prioritybutton,
-										{
-											backgroundColor: "#feb92a",
-											borderColor:
-												colorScheme === "light" ? "#000" : "#fff",
-											borderWidth: 2,
-										},
-								  ]
-								: styles.prioritybutton
-						}
-					>
-						<Text
+						<TouchableOpacity
+							onPress={() => handlerPriority("regular")}
 							style={
 								priority === "regular"
 									? [
-											(styles.priorityText,
+											styles.prioritybutton,
 											{
-												color: colorScheme === "light" ? "#000" : "#fff",
-											}),
+												backgroundColor: "#feb92a",
+												borderColor:
+													colorScheme === "light" ? "#000" : "#fff",
+												borderWidth: 2,
+											},
 									  ]
-									: [(styles.priorityText, { color: "#feb92a" })]
+									: styles.prioritybutton
 							}
 						>
-							REGULAR
-						</Text>
-					</TouchableOpacity>
+							<Text
+								style={
+									priority === "regular"
+										? [
+												(styles.priorityText,
+												{
+													color: colorScheme === "light" ? "#000" : "#fff",
+												}),
+										  ]
+										: [(styles.priorityText, { color: "#feb92a" })]
+								}
+							>
+								REGULAR
+							</Text>
+						</TouchableOpacity>
 
-					<TouchableOpacity
-						onPress={() => handlerPriority("high")}
-						style={
-							priority === "high"
-								? [
-										styles.prioritybutton,
-										{
-											backgroundColor: "#cc0000",
-											borderColor:
-												colorScheme === "light" ? "#000" : "#fff",
-											borderWidth: 2,
-										},
-								  ]
-								: styles.prioritybutton
-						}
-					>
-						<Text
+						<TouchableOpacity
+							onPress={() => handlerPriority("high")}
 							style={
 								priority === "high"
 									? [
-											(styles.priorityText,
+											styles.prioritybutton,
 											{
-												color: colorScheme === "light" ? "#000" : "#fff",
-											}),
+												backgroundColor: "#cc0000",
+												borderColor:
+													colorScheme === "light" ? "#000" : "#fff",
+												borderWidth: 2,
+											},
 									  ]
-									: [(styles.priorityText, { color: "#cc0000" })]
+									: styles.prioritybutton
 							}
 						>
-							HIGH
+							<Text
+								style={
+									priority === "high"
+										? [
+												(styles.priorityText,
+												{
+													color: colorScheme === "light" ? "#000" : "#fff",
+												}),
+										  ]
+										: [(styles.priorityText, { color: "#cc0000" })]
+								}
+							>
+								HIGH
+							</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+
+				<View style={styles.inputContainer}>
+					<View>
+						<Text style={styles.inputTitle}>Alert</Text>
+						<Text style={styles.descrip}>
+							You will receive an alert at the time you set for this
+							reminder
 						</Text>
+					</View>
+					<Switch
+						value={withAlert}
+						onValueChange={(value) => {
+							setWithAlert(value);
+						}}
+						trackColor={{ false: "#767577", true: "#3ccc15" }}
+						thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
+					/>
+				</View>
+				<View style={styles.btons}>
+					<TouchableOpacity onPress={handlerGoBack} style={styles.button}>
+						<Text style={[styles.done, { color: "red" }]}>Cancel</Text>
+					</TouchableOpacity>
+					<TouchableOpacity onPress={addTodo} style={styles.button}>
+						<Text style={styles.done}>Done</Text>
 					</TouchableOpacity>
 				</View>
-			</View>
-
-			<View style={styles.inputContainer}>
-				<View>
-					<Text style={styles.inputTitle}>Alert</Text>
-					<Text style={styles.descrip}>
-						You will receive an alert at the time you set for this reminder
-					</Text>
-				</View>
-				<Switch
-					value={withAlert}
-					onValueChange={(value) => {
-						setWithAlert(value);
-					}}
-					trackColor={{ false: "#767577", true: "#3ccc15" }}
-					thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
-				/>
-			</View>
-			<View style={styles.btons}>
-				<TouchableOpacity onPress={handlerGoBack} style={styles.button}>
-					<Text style={[styles.done, { color: "red" }]}>Cancel</Text>
-				</TouchableOpacity>
-				<TouchableOpacity onPress={addTodo} style={styles.button}>
-					<Text style={styles.done}>Done</Text>
-				</TouchableOpacity>
-			</View>
+			</ScrollView>
 		</View>
 	);
 };
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		paddingHorizontal: 20,
-		paddingVertical: "10%",
-		backgroundColor: colorScheme === "light" ? "#fff" : "#161526",
-	},
-	title: {
-		fontSize: 34,
-		fontWeight: "bold",
-		marginBottom: 35,
-		marginTop: 10,
-		color: colorScheme === "light" ? "black" : "#F7F8FA",
-	},
-	inputTitle: {
-		fontSize: 20,
-		fontWeight: "600",
-		lineHeight: 24,
-		color: colorScheme === "light" ? "black" : "#fff",
-	},
-	textInput: {
-		borderBottomColor: colorScheme === "light" ? "#00000030" : "#fff",
-		borderBottomWidth: 1,
-		width: "65%",
-		color: colorScheme === "light" ? null : "#fff",
-	},
-	inputDescrip: {
-		borderBottomColor: colorScheme === "light" ? "#00000030" : "#fff",
-		borderBottomWidth: 1,
-		width: "65%",
-		color: colorScheme === "light" ? null : "#fff",
-	},
-	inputContainer: {
-		justifyContent: "space-between",
-		flexDirection: "row",
-		paddingBottom: 20,
-		paddingTop: 10,
-		alignItems: "center",
-	},
-	time: {
-		fontSize: 15,
-		fontWeight: "600",
-		lineHeight: 24,
-		color: colorScheme === "light" ? "black" : "#fff",
-	},
-	button: {
-		marginTop: 30,
-		marginBottom: 15,
-		alignItems: "center",
-		justifyContent: "center",
-		backgroundColor: colorScheme === "light" ? "black" : "#fff",
-		height: 46,
-		borderRadius: 11,
-		width: "40%",
-	},
-	btons: {
-		flexDirection: "row",
-		justifyContent: "space-around",
-	},
-	done: {
-		color: colorScheme === "light" ? "#fff" : "black",
-		fontWeight: "bold",
-		fontSize: 20,
-	},
-	descrip: {
-		color: colorScheme === "light" ? "#00000060" : "#fff",
-		fontSize: 12,
-		maxWidth: "85%",
-	},
-	priorityText: {
-		color: colorScheme === "light" ? "#fff" : "#000",
-		fontWeight: "bold",
-		fontSize: 14,
-	},
-	prioritybutton: {
-		alignItems: "center",
-		justifyContent: "center",
-		height: 40,
-		margin: 10,
-		borderRadius: 2,
-		padding: 6,
-		backgroundColor: colorScheme === "light" ? "black" : "#fff",
-	},
-});
 
 export default AddToDo;

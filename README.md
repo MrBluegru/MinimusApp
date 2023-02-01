@@ -1,4 +1,4 @@
-# todoBlue-App by Mr. Blue
+# todoBlue by Mr. Blue
 
 ## App of ToDo
 

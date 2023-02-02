@@ -18,6 +18,14 @@ import { useNavigation } from "@react-navigation/native";
 import * as Notifications from "expo-notifications";
 import { Appearance } from "react-native";
 import { styles } from "../styles/addToDo";
+import {
+	backgroundTodoTheme,
+	borderDarkWhite,
+	blackWhite,
+	whiteBlack,
+	defaultWhite,
+	whiteGrey,
+} from "../styles/colors";
 
 const AddToDo = () => {
 	const dispatch = useDispatch();
@@ -177,6 +185,7 @@ const AddToDo = () => {
 			setErrorActive(true);
 		}
 	};
+
 	return (
 		<View style={styles.container}>
 			<Text style={styles.title}>Add Todo</Text>
@@ -187,7 +196,7 @@ const AddToDo = () => {
 					<TextInput
 						style={styles.textInput}
 						placeholder="Task title"
-						placeholderTextColor={colorScheme === "light" ? null : "grey"}
+						placeholderTextColor={whiteGrey}
 						onChangeText={(text) => {
 							setName(text);
 						}}
@@ -207,7 +216,7 @@ const AddToDo = () => {
 						numberOfLines={5}
 						style={styles.inputDescrip}
 						placeholder="task description..."
-						placeholderTextColor={colorScheme === "light" ? null : "grey"}
+						placeholderTextColor={whiteGrey}
 						onChangeText={(text) => {
 							setDescription(text);
 						}}
@@ -269,8 +278,7 @@ const AddToDo = () => {
 											styles.prioritybutton,
 											{
 												backgroundColor: "#00a400",
-												borderColor:
-													colorScheme === "light" ? "#000" : "#fff",
+												borderColor: blackWhite,
 												borderWidth: 2,
 											},
 									  ]
@@ -283,7 +291,7 @@ const AddToDo = () => {
 										? [
 												(styles.priorityText,
 												{
-													color: colorScheme === "light" ? "#000" : "#fff",
+													color: blackWhite,
 												}),
 										  ]
 										: [(styles.priorityText, { color: "#00a400" })]
@@ -301,8 +309,7 @@ const AddToDo = () => {
 											styles.prioritybutton,
 											{
 												backgroundColor: "#feb92a",
-												borderColor:
-													colorScheme === "light" ? "#000" : "#fff",
+												borderColor: blackWhite,
 												borderWidth: 2,
 											},
 									  ]
@@ -315,7 +322,7 @@ const AddToDo = () => {
 										? [
 												(styles.priorityText,
 												{
-													color: colorScheme === "light" ? "#000" : "#fff",
+													color: blackWhite,
 												}),
 										  ]
 										: [(styles.priorityText, { color: "#feb92a" })]
@@ -333,8 +340,7 @@ const AddToDo = () => {
 											styles.prioritybutton,
 											{
 												backgroundColor: "#cc0000",
-												borderColor:
-													colorScheme === "light" ? "#000" : "#fff",
+												borderColor: blackWhite,
 												borderWidth: 2,
 											},
 									  ]
@@ -347,7 +353,7 @@ const AddToDo = () => {
 										? [
 												(styles.priorityText,
 												{
-													color: colorScheme === "light" ? "#000" : "#fff",
+													color: blackWhite,
 												}),
 										  ]
 										: [(styles.priorityText, { color: "#cc0000" })]

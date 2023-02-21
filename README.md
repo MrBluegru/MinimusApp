@@ -24,9 +24,9 @@ APK - **<a href="https://expo.dev/accounts/mrbluegru/projects/todoBlue/builds/9e
 
 ## Construido con:
 
-0. Expo
-1. React Native
-2. React Navigation
-3. React Redux
-4. Redux Toolkit
+- Expo
+- React Native
+- React Navigation
+- React Redux
+- Redux Toolkit
 

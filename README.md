@@ -1,4 +1,4 @@
-# todoBlue by Mr. Blue
+# todoBlue
 
 <p align="center">
   <img height="250" src="./assets/icon.png" />

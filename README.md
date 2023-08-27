@@ -19,7 +19,7 @@
 
 # Descargar instalador para Android
 
-APK - **<a href="https://expo.dev/accounts/mrbluegru/projects/todoBlue/builds/9e32f51c-ca61-4dbf-ab4f-4dd9f3316551" target="_blank" rel="noreferrer">todoblue</a>**
+APK - **<a href="https://drive.google.com/file/d/1-DrSRArCgheOqLJwsGSPbNhKQusj-4nu/view" target="_blank" rel="noreferrer">todoblue</a>**
 
 
 ## Construido con:

@@ -1,7 +1,7 @@
 # todoBlue
 
-<p align="center">
-  <img height="250" src="./assets/icon.png" />
+<p align='center'>
+  <img src="./assets/todoBlue.gif" height="600px"/>
 </p>
 
 #### Es una aplicación movil de lista de quehaceres, en la que se puede crear tareas con diferentes tipos de prioridades, en la fecha y hora que se seleccione, cuenta con la opcion de notificar. El tema de la aplicacion sera el usado por el sistema(dark o light)
